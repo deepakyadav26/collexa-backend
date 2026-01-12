@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema(
       enum: USER_ROLES,
       default: 'student',
     },
+    jobType: {
+      type: String,
+      enum: ['internship', 'job'],
+      default: 'job',
+    },
     // basic profile fields (can be expanded later)
     profile: {
       headline: { type: String, trim: true },
