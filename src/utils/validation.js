@@ -7,7 +7,7 @@ const validator = require('validator');
  */
 const validateRegister = (data) => {
   const errors = [];
-  const { firstName, lastName, emailId, phoneNumber, password, role } = data;
+  const { firstName, lastName, emailId, phoneNumber, password, role, jobType } = data;
 
   // First name validation
   if (!firstName || typeof firstName !== 'string' || !firstName.trim()) {
@@ -80,6 +80,21 @@ const validateRegister = (data) => {
       field: 'role',
       message: 'Role must be student or employer',
     });
+  }
+
+  // JobType validation (optional)
+  if (jobType !== undefined && jobType !== null) {
+    if (typeof jobType !== 'string') {
+      errors.push({
+        field: 'jobType',
+        message: 'jobType must be a string',
+      });
+    } else if (!['internship', 'job'].includes(jobType)) {
+      errors.push({
+        field: 'jobType',
+        message: 'jobType must be either "internship" or "job"',
+      });
+    }
   }
 
   return errors;

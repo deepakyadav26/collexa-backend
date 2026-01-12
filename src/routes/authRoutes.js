@@ -48,7 +48,7 @@ router.post('/register', async (req, res) => {
     }
 
     try {
-      const { firstName, lastName, emailId, phoneNumber, password, role } =
+      const { firstName, lastName, emailId, phoneNumber, password, role, jobType } =
         req.body;
 
       const existing = await User.findOne({ emailId });
@@ -64,6 +64,7 @@ router.post('/register', async (req, res) => {
         phoneNumber: phoneNumber.trim(),
         password,
         role: role || 'student',
+        jobType: jobType || 'job', // Default to 'job' if not provided
       });
 
       return res
