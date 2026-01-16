@@ -19,6 +19,7 @@ router.post('/', protect, async (req, res) => {
 
     try {
       req.user.profile = { ...req.body };
+      console.log(req.user.profile);
       await req.user.save();
       return res.status(201).json({ message: 'Profile created', profile: req.user.profile });
     } catch (err) {
