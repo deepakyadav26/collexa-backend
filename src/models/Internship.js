@@ -17,9 +17,9 @@ const internshipSchema = new mongoose.Schema(
       enum: ['office', 'remote', 'hybrid'],
       default: 'office',
     },
-    employer: {
+    company: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Company',
       required: true,
     },
     isActive: { type: Boolean, default: true },

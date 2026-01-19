@@ -13,7 +13,9 @@ const generateToken = (userId) => {
 };
 
 const sendTokenResponse = (user, res, message = 'Login successfully') => {
-  const token = generateToken(user._id);
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  });
 
   const cookieOptions = {
     httpOnly: true,
@@ -30,14 +32,51 @@ const sendTokenResponse = (user, res, message = 'Login successfully') => {
       token,
       user: {
         id: user._id,
+        role: user.role,
+        // Add other fields if necessary, but for admin strictly role is important
         firstName: user.firstName,
         lastName: user.lastName,
-        emailId: user.emailId,
-        phoneNumber: user.phoneNumber,
-        role: user.role,
       },
     });
 };
+
+// POST /api/auth/admin/login
+router.post('/admin/login', async (req, res) => {
+  const { emailId, password } = req.body;
+  
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@collexa.com';
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
+  if (emailId === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    // Issue token with 'admin' role
+    const token = jwt.sign({ id: 'admin_id_001', role: 'admin' }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    };
+
+    return res
+      .cookie('token', token, cookieOptions)
+      .status(200)
+      .json({
+        message: 'Admin logged in successfully',
+        token,
+        user: {
+          id: 'admin_id_001',
+          role: 'admin',
+          firstName: 'Admin',
+          lastName: 'User',
+        },
+      });
+  } else {
+    return res.status(401).json({ message: 'Invalid admin credentials' });
+  }
+});
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {

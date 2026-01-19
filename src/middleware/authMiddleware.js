@@ -14,12 +14,19 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Handle Admin (Virtual User)
+    if (decoded.role === 'admin') {
+      req.user = { _id: decoded.id, role: 'admin' };
+      return next();
+    }
+
     const user = await User.findById(decoded.id);
 
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
-    console.log(user);
+    // console.log(user); 
     req.user = user;
     next();
   } catch (err) {

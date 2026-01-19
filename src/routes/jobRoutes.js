@@ -5,11 +5,11 @@ const { validateJobOrInternship } = require('../utils/validation');
 
 const router = express.Router();
 
-// POST /api/jobs/addjob - create job (employer only)
+// POST /api/jobs/addjob - create job (Admin only)
 router.post(
   '/addjob',
   protect,
-  authorizeRoles('employer'),
+  authorizeRoles('admin'),
   async (req, res) => {
     // Validate request data
     const errors = validateJobOrInternship(req.body);
@@ -19,10 +19,11 @@ router.post(
 
     try {
       const data = req.body;
-      const job = await Job.create({
-        ...data,
-        employer: req.user._id,
-      });
+      if (!data.company) {
+        return res.status(400).json({ message: 'Company ID is required' });
+      }
+
+      const job = await Job.create(data);
       return res.status(201).json({ message: 'Job created', job });
     } catch (err) {
       console.error(err);
@@ -31,15 +32,12 @@ router.post(
   }
 );
 
-// GET /api/jobs/listingjob - list all active jobs (both roles can view)
+// GET /api/jobs/listingjob - list all active jobs (Authenticated users)
 router.get('/listingjob', protect, async (req, res) => {
   try {
     const filter = { isActive: true };
-    if (req.user.role === 'employer') {
-      // employer can see their own jobs (active + inactive) if needed;
-      // but requirement says listing; we show all active for now
-    }
-    const jobs = await Job.find(filter).sort({ createdAt: -1 });
+    // Populate company details
+    const jobs = await Job.find(filter).populate('company').sort({ createdAt: -1 });
     return res.status(200).json({ jobs });
   } catch (err) {
     console.error(err);
@@ -50,7 +48,7 @@ router.get('/listingjob', protect, async (req, res) => {
 // GET /api/jobs/jobdetails/:id - get single job
 router.get('/jobdetails/:id', protect, async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById(req.params.id).populate('company');
     if (!job) {
       return res.status(404).json({ message: 'Job not found' });
     }
@@ -61,21 +59,18 @@ router.get('/jobdetails/:id', protect, async (req, res) => {
   }
 });
 
-// PATCH /api/jobs/updatejob/:id - update job (employer owner only)
+// PATCH /api/jobs/updatejob/:id - update job (Admin only)
 router.patch(
   '/updatejob/:id',
   protect,
-  authorizeRoles('employer'),
+  authorizeRoles('admin'),
   async (req, res) => {
     try {
-      const job = await Job.findOne({
-        _id: req.params.id,
-        employer: req.user._id,
-      });
+      const job = await Job.findById(req.params.id);
       if (!job) {
         return res
           .status(404)
-          .json({ message: 'Job not found or not authorized' });
+          .json({ message: 'Job not found' });
       }
 
       Object.assign(job, req.body);
@@ -89,21 +84,18 @@ router.patch(
   }
 );
 
-// DELETE /api/jobs/deletejob/:id - delete job (employer owner only)
+// DELETE /api/jobs/deletejob/:id - delete job (Admin only)
 router.delete(
   '/deletejob/:id',
   protect,
-  authorizeRoles('employer'),
+  authorizeRoles('admin'),
   async (req, res) => {
     try {
-      const job = await Job.findOneAndDelete({
-        _id: req.params.id,
-        employer: req.user._id,
-      });
+      const job = await Job.findByIdAndDelete(req.params.id);
       if (!job) {
         return res
           .status(404)
-          .json({ message: 'Job not found or not authorized' });
+          .json({ message: 'Job not found' });
       }
 
       return res.status(200).json({ message: 'Job deleted' });
