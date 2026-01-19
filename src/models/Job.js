@@ -16,9 +16,9 @@ const jobSchema = new mongoose.Schema(
     skillsRequired: [{ type: String, trim: true }],
     openings: { type: Number, default: 1 },
     experienceLevel: { type: String, trim: true },
-    employer: {
+    company: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Company',
       required: true,
     },
     isActive: { type: Boolean, default: true },

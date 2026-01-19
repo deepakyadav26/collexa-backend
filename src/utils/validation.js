@@ -241,7 +241,6 @@ const validateJobOrInternship = (data) => {
       message: 'Description is required',
     });
   }
-
   // Company name validation
   if (!data.companyName || typeof data.companyName !== 'string' || !data.companyName.trim()) {
     errors.push({

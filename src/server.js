@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const internshipRoutes = require('./routes/internshipRoutes');
+const companyRoutes = require('./routes/companyRoutes');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/userprofile', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/internship', internshipRoutes);
+app.use('/api/companies', companyRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/collexa';
