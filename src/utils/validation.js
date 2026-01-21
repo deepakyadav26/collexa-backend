@@ -260,11 +260,60 @@ const validateJobOrInternship = (data) => {
   return errors;
 };
 
+/**
+ * Validates company registration data
+ * @param {Object} data - Company registration data
+ * @returns {Array} Array of error objects
+ */
+const validateCompanyRegister = (data) => {
+  const errors = [];
+  const { 
+    company_name, 
+    registration_number, 
+    company_email, 
+    owner_full_name, 
+    owner_email, 
+    password, 
+    terms_accepted 
+  } = data;
+
+  if (!company_name || !company_name.trim()) {
+    errors.push({ field: 'company_name', message: 'Company name is required' });
+  }
+
+  if (!registration_number || !registration_number.trim()) {
+    errors.push({ field: 'registration_number', message: 'Registration number is required' });
+  }
+
+  if (!company_email || !validator.isEmail(company_email)) {
+    errors.push({ field: 'company_email', message: 'A valid company email is required' });
+  }
+
+  if (!owner_full_name || !owner_full_name.trim()) {
+    errors.push({ field: 'owner_full_name', message: 'Owner full name is required' });
+  }
+
+  if (!owner_email || !validator.isEmail(owner_email)) {
+    errors.push({ field: 'owner_email', message: 'A valid owner email is required' });
+  }
+
+  if (!password || password.length < 6) {
+    errors.push({ field: 'password', message: 'Password must be at least 6 characters' });
+  }
+
+  if (!terms_accepted) {
+    errors.push({ field: 'terms_accepted', message: 'You must accept the terms and conditions' });
+  }
+
+  return errors;
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
   validateEmail,
   validateProfile,
   validateJobOrInternship,
+  validateCompanyRegister,
   validator, // Export validator for custom validations
 };

@@ -2,12 +2,17 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
-const { validateRegister, validateLogin, validateEmail } = require('../utils/validation');
+const { 
+  validateRegister, 
+  validateLogin, 
+  validateEmail, 
+  validateCompanyRegister 
+} = require('../utils/validation');
 
 const router = express.Router();
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const generateToken = (userId, role) => {
+  return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 };
@@ -33,12 +38,85 @@ const sendTokenResponse = (user, res, message = 'Login successfully') => {
       user: {
         id: user._id,
         role: user.role,
-        // Add other fields if necessary, but for admin strictly role is important
         firstName: user.firstName,
         lastName: user.lastName,
       },
     });
 };
+
+// POST /api/auth/join-as-company
+router.post('/join-as-company', async (req, res) => {
+  // Validate request data
+  const errors = validateCompanyRegister(req.body);
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  try {
+    const {
+      company_name,
+      company_type,
+      registration_number,
+      incorporation_date,
+      industry,
+      company_email,
+      company_phone,
+      registered_address,
+      city,
+      state,
+      country,
+      postal_code,
+      owner_full_name,
+      owner_email,
+      password,
+      terms_accepted
+    } = req.body;
+
+    const existing = await User.findOne({ emailId: owner_email.toLowerCase() });
+    if (existing) {
+      return res.status(400).json({ message: 'Owner email already registered' });
+    }
+
+    // Split owner_full_name into first and last name
+    const nameParts = owner_full_name.trim().split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || '.';
+
+    const user = await User.create({
+      firstName,
+      lastName,
+      emailId: owner_email.trim().toLowerCase(),
+      phoneNumber: company_phone,
+      password,
+      role: 'company',
+      companyDetails: {
+        companyName: company_name,
+        companyType: company_type,
+        registrationNumber: registration_number,
+        incorporationDate: incorporation_date,
+        industry,
+        companyEmail: company_email,
+        companyPhone: company_phone,
+        registeredAddress: registered_address,
+        city,
+        state,
+        country,
+        postalCode: postal_code,
+        termsAccepted: terms_accepted
+      }
+    });
+
+    return res.status(201).json({ 
+      success: true, 
+      message: 'Company registered successfully', 
+      userId: user._id 
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 // POST /api/auth/admin/login
 router.post('/admin/login', async (req, res) => {

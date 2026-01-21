@@ -5,9 +5,9 @@ const { validateJobOrInternship } = require('../utils/validation');
 
 const router = express.Router();
 
-// POST /api/internship/addjob - create internship (Admin only)
+// POST /api/internship/addinternship - create internship (Admin only)
 router.post(
-  '/addjob',
+  '/addinternship',
   protect,
   authorizeRoles('admin'),
   async (req, res) => {
@@ -34,8 +34,8 @@ router.post(
   }
 );
 
-// GET /api/internship/listingjob - list all active internships
-router.get('/listingjob', protect, async (req, res) => {
+// GET /api/internship/listinginternship - list all active internships
+router.get('/listinginternship', protect, async (req, res) => {
   try {
     const internships = await Internship.find({ isActive: true })
       .populate('company')
@@ -49,8 +49,8 @@ router.get('/listingjob', protect, async (req, res) => {
   }
 });
 
-// GET /api/internship/internship/:id - internship details
-router.get('/internship/:id', protect, async (req, res) => {
+// GET /api/internship/:id - get single internship details
+router.get('/:id', protect, async (req, res) => {
   try {
     const internship = await Internship.findById(req.params.id).populate('company');
     if (!internship) {

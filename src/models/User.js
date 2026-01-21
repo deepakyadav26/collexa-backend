@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
-const USER_ROLES = ['student', 'employer'];
+const USER_ROLES = ['student', 'employer', 'company'];
 
 const userSchema = new mongoose.Schema(
   {
@@ -32,12 +32,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Phone number is required'],
       trim: true,
-      validate: {
-        validator: function (v) {
-          return validator.isMobilePhone(v + '', 'any', { strictMode: false });
-        },
-        message: 'Please provide a valid phone number',
-      },
     },
     password: {
       type: String,
@@ -55,13 +49,28 @@ const userSchema = new mongoose.Schema(
       enum: ['internship', 'job'],
       default: 'job',
     },
+    // Company Registration Fields
+    companyDetails: {
+      companyName: { type: String, trim: true },
+      companyType: { type: String, trim: true },
+      registrationNumber: { type: String, trim: true },
+      incorporationDate: { type: Date },
+      industry: { type: String, trim: true },
+      companyEmail: { type: String, trim: true },
+      companyPhone: { type: String, trim: true },
+      registeredAddress: { type: String, trim: true },
+      city: { type: String, trim: true },
+      state: { type: String, trim: true },
+      country: { type: String, trim: true },
+      postalCode: { type: String, trim: true },
+      termsAccepted: { type: Boolean, default: false }
+    },
     // basic profile fields (can be expanded later)
     profile: {
       headline: { type: String, trim: true },
       bio: { type: String, trim: true },
       skills: [{ type: String, trim: true }],
       resumeUrl: { type: String, trim: true },
-      companyName: { type: String, trim: true }, // for employer
       website: { type: String, trim: true },
       location: { type: String, trim: true },
     },
