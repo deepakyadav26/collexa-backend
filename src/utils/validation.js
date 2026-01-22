@@ -308,6 +308,34 @@ const validateCompanyRegister = (data) => {
   return errors;
 };
 
+/**
+ * Validates blog data
+ * @param {Object} data - Blog data
+ * @returns {Array} Array of error objects
+ */
+const validateBlog = (data) => {
+  const errors = [];
+  const { title, content, excerpt, category } = data;
+
+  if (!title || !title.trim()) {
+    errors.push({ field: 'title', message: 'Title is required' });
+  }
+
+  if (!content || !content.trim()) {
+    errors.push({ field: 'content', message: 'Content is required' });
+  }
+
+  if (!excerpt || !excerpt.trim()) {
+    errors.push({ field: 'excerpt', message: 'Excerpt is required' });
+  }
+
+  if (!category || !category.trim()) {
+    errors.push({ field: 'category', message: 'Category is required' });
+  }
+
+  return errors;
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -315,5 +343,6 @@ module.exports = {
   validateProfile,
   validateJobOrInternship,
   validateCompanyRegister,
+  validateBlog,
   validator, // Export validator for custom validations
 };
