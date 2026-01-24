@@ -39,7 +39,7 @@ router.patch('/', protect, async (req, res) => {
 
     try {
       req.user.profile = { ...(req.user.profile || {}), ...req.body };
-      await req.user.save();
+      await req.user.save(); 
       return res.status(200).json({ message: 'Profile updated', profile: req.user.profile });
     } catch (err) {
       console.error(err);

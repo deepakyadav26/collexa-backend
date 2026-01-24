@@ -32,8 +32,8 @@ router.post(
   }
 );
 
-// GET /api/jobs/listingjob - list all active jobs (Authenticated users)
-router.get('/listingjob', protect, async (req, res) => {
+// GET /api/jobs/listingjob - list all active jobs (Publicly accessible)
+router.get('/listingjob', async (req, res) => {
   try {
     const filter = { isActive: true };
     // Populate company details
