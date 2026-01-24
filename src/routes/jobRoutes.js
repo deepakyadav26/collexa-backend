@@ -45,8 +45,8 @@ router.get('/listingjob', async (req, res) => {
   }
 });
 
-// GET /api/jobs/jobdetails/:id - get single job
-router.get('/jobdetails/:id', protect, async (req, res) => {
+// GET /api/jobs/jobdetails/:id - get single job (Publicly accessible)
+router.get('/jobdetails/:id', async (req, res) => {
   try {
     const job = await Job.findById(req.params.id).populate('company');
     if (!job) {
