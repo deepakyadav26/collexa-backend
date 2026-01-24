@@ -24,7 +24,7 @@ const sendTokenResponse = (user, res, message = 'Login successfully') => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', 
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
@@ -103,7 +103,8 @@ router.post('/join-as-company', async (req, res) => {
         country,
         postalCode: postal_code,
         termsAccepted: terms_accepted
-      }
+      },
+      profile: {} // Initialize empty profile for default values
     });
 
     return res.status(201).json({ 
@@ -182,6 +183,7 @@ router.post('/register', async (req, res) => {
         password,
         role: role || 'student',
         jobType: jobType || 'job', // Default to 'job' if not provided
+        profile: {}, // Initialize empty profile to trigger default values like profilePicture
       });
 
       return res

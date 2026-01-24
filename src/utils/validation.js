@@ -201,6 +201,13 @@ const validateProfile = (data) => {
     });
   }
 
+  if (data.profilePicture !== undefined && typeof data.profilePicture !== 'string') {
+    errors.push({
+      field: 'profilePicture',
+      message: 'Profile picture must be a string',
+    });
+  }
+
   if (data.website !== undefined && typeof data.website !== 'string') {
     errors.push({
       field: 'website',
