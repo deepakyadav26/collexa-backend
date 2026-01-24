@@ -71,6 +71,10 @@ const userSchema = new mongoose.Schema(
       bio: { type: String, trim: true },
       skills: [{ type: String, trim: true }],
       resumeUrl: { type: String, trim: true },
+      profilePicture: { 
+        type: String, 
+        default: 'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg' 
+      },
       website: { type: String, trim: true },
       location: { type: String, trim: true },
     },
