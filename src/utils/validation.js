@@ -249,12 +249,12 @@ const validateJobOrInternship = (data) => {
     });
   }
   // Company name validation
-  if (!data.companyName || typeof data.companyName !== 'string' || !data.companyName.trim()) {
-    errors.push({
-      field: 'companyName',
-      message: 'Company name is required',
-    });
-  }
+  // if (!data.companyName || typeof data.companyName !== 'string' || !data.companyName.trim()) {
+  //   errors.push({
+  //     field: 'companyName',
+  //     message: 'Company name is required',
+  //   });
+  // }
 
   // Location validation
   if (!data.location || typeof data.location !== 'string' || !data.location.trim()) {

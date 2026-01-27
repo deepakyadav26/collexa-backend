@@ -19,11 +19,12 @@ router.post(
 
     try {
       const data = req.body;
-      if (!data.company) {
-        return res.status(400).json({ message: 'Company ID is required' });
-      }
+      // if (!data.company) {
+      //   return res.status(400).json({ message: 'Company ID is required' });
+      // }
 
       const job = await Job.create(data);
+      await job.populate('company');
       return res.status(201).json({ message: 'Job created', job });
     } catch (err) {
       console.error(err);

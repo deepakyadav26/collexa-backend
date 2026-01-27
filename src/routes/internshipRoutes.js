@@ -24,6 +24,7 @@ router.post(
       }
 
       const internship = await Internship.create(data);
+      await internship.populate('company');
       return res
         .status(201)
         .json({ message: 'Internship created', internship });
