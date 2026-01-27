@@ -24,6 +24,7 @@ router.post(
       }
 
       const internship = await Internship.create(data);
+      await internship.populate('company');
       return res
         .status(201)
         .json({ message: 'Internship created', internship });
@@ -34,8 +35,8 @@ router.post(
   }
 );
 
-// GET /api/internship/listinginternship - list all active internships
-router.get('/listinginternship', protect, async (req, res) => {
+// GET /api/internship/listinginternship - list all active internships (Publicly accessible)
+router.get('/listinginternship', async (req, res) => {
   try {
     const internships = await Internship.find({ isActive: true })
       .populate('company')
@@ -49,8 +50,8 @@ router.get('/listinginternship', protect, async (req, res) => {
   }
 });
 
-// GET /api/internship/:id - get single internship details
-router.get('/:id', protect, async (req, res) => {
+// GET /api/internship/:id - get single internship details (Publicly accessible)
+router.get('/:id', async (req, res) => {
   try {
     const internship = await Internship.findById(req.params.id).populate('company');
     if (!internship) {
