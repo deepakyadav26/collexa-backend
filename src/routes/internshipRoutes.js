@@ -35,7 +35,7 @@ router.post(
   }
 );
 
-// GET /api/internship/listinginternship - list all active internships (Publicly accessible)
+// GET /api/internship/listinginternship - list all active internships (Publicly accessible) for intership
 router.get('/listinginternship', async (req, res) => {
   try {
     const internships = await Internship.find({ isActive: true })
