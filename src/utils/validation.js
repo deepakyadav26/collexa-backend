@@ -343,6 +343,55 @@ const validateBlog = (data) => {
   return errors;
 };
 
+/**
+ * Validates campus course data
+ * @param {Object} data - Campus course data
+ * @returns {Array} Array of error objects
+ */
+const validateCampusCourse = (data) => {
+  const errors = [];
+  const { 
+    universityName, 
+    courseName, 
+    degreeType, 
+    description, 
+    duration, 
+    level, 
+    location 
+  } = data;
+
+  if (!universityName || !universityName.trim()) {
+    errors.push({ field: 'universityName', message: 'University name is required' });
+  }
+
+  if (!courseName || !courseName.trim()) {
+    errors.push({ field: 'courseName', message: 'Course name is required' });
+  }
+
+  if (!degreeType || !degreeType.trim()) {
+    errors.push({ field: 'degreeType', message: 'Degree type is required' });
+  }
+
+  if (!description || !description.trim()) {
+    errors.push({ field: 'description', message: 'Description is required' });
+  }
+
+  if (!duration || !duration.trim()) {
+    errors.push({ field: 'duration', message: 'Duration is required' });
+  }
+
+  if (!level || !level.trim()) {
+    errors.push({ field: 'level', message: 'Course level is required' });
+  }
+
+  if (!location || !location.trim()) {
+    errors.push({ field: 'location', message: 'Location is required' });
+  }
+
+  return errors;
+};
+
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -351,5 +400,6 @@ module.exports = {
   validateJobOrInternship,
   validateCompanyRegister,
   validateBlog,
+  validateCampusCourse,
   validator, // Export validator for custom validations
 };
