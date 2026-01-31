@@ -15,6 +15,7 @@ const companyRoutes = require('./routes/companyRoutes');
 const adminUserRoutes = require('./routes/adminUserRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const campusCourseRoutes = require('./routes/campusCourseRoutes');
+const applicationRoutes = require('./routes/applicationRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'Collexa Backend API running' });
@@ -38,6 +40,7 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/admin', adminUserRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/campuscourses', campusCourseRoutes);
+app.use('/api/applications', applicationRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/collexa';
