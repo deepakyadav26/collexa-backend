@@ -392,6 +392,40 @@ const validateCampusCourse = (data) => {
 };
 
 
+const validateCampusCourseLead = (data) => {
+  const errors = [];
+  const { name, email, phone, course, state, termsAccepted } = data;
+
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    errors.push({ field: 'name', message: 'Name is required' });
+  }
+
+  if (!email || typeof email !== 'string' || !email.trim()) {
+    errors.push({ field: 'email', message: 'Email is required' });
+  } else if (!validator.isEmail(email.trim())) {
+    errors.push({ field: 'email', message: 'Valid email is required' });
+  }
+
+  if (!phone || typeof phone !== 'string' || !phone.trim()) {
+    errors.push({ field: 'phone', message: 'Phone number is required' });
+  }
+
+  if (!course || typeof course !== 'string' || !course.trim()) {
+    errors.push({ field: 'course', message: 'Course is required' });
+  }
+
+  if (!state || typeof state !== 'string' || !state.trim()) {
+    errors.push({ field: 'state', message: 'State is required' });
+  }
+
+  // Validate Terms
+  if (!termsAccepted || (typeof termsAccepted === 'string' && termsAccepted !== 'true') || termsAccepted === false) {
+    errors.push({ field: 'termsAccepted', message: 'You must accept the terms and conditions' });
+  }
+
+  return errors;
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -401,5 +435,6 @@ module.exports = {
   validateCompanyRegister,
   validateBlog,
   validateCampusCourse,
+  validateCampusCourseLead,
   validator, // Export validator for custom validations
 };
