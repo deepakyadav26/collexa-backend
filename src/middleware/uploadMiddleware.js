@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 // File filter (PDF and DOC/DOCX only)
 const fileFilter = (req, file, cb) => {
-  console.log('Multer Processing File:', file.originalname, file.mimetype);
+  // console.log('Multer Processing File:', file.originalname, file.mimetype);
   const allowedFileTypes = /pdf|doc|docx/;
   const extname = allowedFileTypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = allowedFileTypes.test(file.mimetype);
