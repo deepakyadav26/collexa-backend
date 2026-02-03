@@ -62,10 +62,10 @@ router.post(
   }
 );
 
-// @route   GET /api/certificate-courses/list
+// @route   GET /api/certificatecourses/listAll
 // @desc    List all certificate courses
 // @access  Public
-router.get('/list', async (req, res) => {
+router.get('/listAll', async (req, res) => {
   try {
     // Optional: Filtering/sorting could be added via query params
     const courses = await CertificateCourse.find().sort({ createdAt: -1 });
@@ -81,7 +81,7 @@ router.get('/list', async (req, res) => {
   }
 });
 
-// @route   GET /api/certificate-courses/:id
+// @route   GET /api/certificatecourses/:id
 // @desc    Get single certificate course
 // @access  Public
 router.get('/:id', async (req, res) => {
@@ -105,7 +105,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// @route   PUT /api/certificate-courses/update/:id
+// @route   PUT /api/certificatecourses/update/:id
 // @desc    Update a certificate course
 // @access  Private (Admin only)
 router.patch(
