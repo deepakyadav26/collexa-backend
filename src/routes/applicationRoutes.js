@@ -39,6 +39,7 @@ router.post('/apply/:jobId', protect, upload.single('resume'), async (req, res) 
     if (!whyHireYou || !whyHireYou.trim()) errors.push({ field: 'whyHireYou', message: 'Answer to "Why should we hire you?" is required' });
 
     if (errors.length > 0) {
+      console.log('Validation Errors:', errors); // Log specific validation failures
       // Remove uploaded file to save space if validation fails
       if (req.file) fs.unlinkSync(req.file.path);
       return res.status(400).json({ message: 'Validation Error', errors });
@@ -143,6 +144,9 @@ router.patch(
     try {
       const { applicationId } = req.params;
       const { status } = req.body;
+
+      // console.log('PATCH Status Update - Body:', req.body);
+      // console.log('Received Status:', status);
 
       // Validate status
       const validStatuses = ['Applied', 'Shortlisted', 'Rejected', 'Hired'];
