@@ -16,6 +16,7 @@ const adminUserRoutes = require('./routes/adminUserRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const campusCourseRoutes = require('./routes/campusCourseRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const internshipApplicationRoutes = require('./routes/internshipApplicationRoutes');
 const certificateCourseRoutes = require('./routes/certificateCourseRoutes');
 
 const app = express();
@@ -41,7 +42,8 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/admin', adminUserRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/campuscourses', campusCourseRoutes);
-app.use('/api/applications', applicationRoutes);
+app.use('/api/applications', applicationRoutes); //  Job Application Routes
+app.use('/api/internship-applications', internshipApplicationRoutes);
 app.use('/api/certificatecourses', certificateCourseRoutes);
 
 const PORT = process.env.PORT || 5000;
