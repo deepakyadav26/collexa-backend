@@ -93,11 +93,14 @@ router.get('/my-applications', protect, async (req, res) => {
     const userId = req.user._id;
 
     const applications = await InternshipApplication.find({ user: userId })
+      .select('status createdAt internship')
       .populate({
         path: 'internship',
+        select: 'title location stipendMin stipendMax duration mode company',
         populate: {
             path: 'company',
-            model: 'Company'
+            model: 'Company',
+            select: 'name logoUrl location'
         }
       })
       .sort({ createdAt: -1 });
@@ -113,7 +116,7 @@ router.get('/my-applications', protect, async (req, res) => {
 // @desc    Get all applications for a specific internship (Admin view)
 // @access  Private (Admin only)
 router.get(
-  '/internship-applications/:internshipId',
+  '/all-applications/:internshipId',
   protect,
   authorizeRoles('admin'),
   async (req, res) => {
@@ -144,6 +147,8 @@ router.patch(
     try {
       const { applicationId } = req.params;
       const { status } = req.body;
+      
+      console.log('Received Status Update Request:', { applicationId, status, body: req.body });
 
       // Validate status
       const validStatuses = ['Applied', 'Shortlisted', 'Rejected', 'Hired'];
