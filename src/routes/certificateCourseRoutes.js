@@ -81,6 +81,89 @@ router.get('/listAll', async (req, res) => {
   }
 });
 
+const LeadCertificateCourse = require('../models/LeadCertificateCourse');
+
+// @route   POST /api/certificatecourses/createCertificateLead
+// @desc    Create a new lead for a certificate course
+// @access  Public
+router.post('/createCertificateLead', async (req, res) => {
+  try {
+    const { fullName, email, phoneNumber, cityState, courseId, courseName } = req.body;
+
+    const lead = await LeadCertificateCourse.create({
+      fullName,
+      email,
+      phoneNumber,
+      cityState,
+      courseId,
+      courseName
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Application submitted successfully. We will contact you soon.',
+      lead
+    });
+  } catch (err) {
+    console.error('Error creating certificate lead:', err);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/certificatecourses/leads
+// @desc    Get all certificate course leads
+// @access  Private (Admin only)
+router.get(
+  '/leads',
+  protect,
+  authorizeRoles('admin'),
+  async (req, res) => {
+    try {
+      const leads = await LeadCertificateCourse.find()
+        .sort({ createdAt: -1 })
+        .populate('courseId', 'title');
+
+      return res.status(200).json({
+        success: true,
+        count: leads.length,
+        leads
+      });
+    } catch (err) {
+      console.error('Error fetching leads:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// @route   DELETE /api/certificatecourses/leads/:id
+// @desc    Delete a certificate course lead
+// @access  Private (Admin only)
+router.delete(
+  '/leads/:id',
+  protect,
+  authorizeRoles('admin'),
+  async (req, res) => {
+    try {
+      const lead = await LeadCertificateCourse.findById(req.params.id);
+
+      if (!lead) {
+        return res.status(404).json({ message: 'Lead not found' });
+      }
+
+      await lead.deleteOne();
+
+      return res.status(200).json({ message: 'Lead deleted successfully' });
+    } catch (err) {
+      console.error('Error deleting lead:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
 // @route   GET /api/certificatecourses/:id
 // @desc    Get single certificate course
 // @access  Public
