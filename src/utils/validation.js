@@ -426,6 +426,42 @@ const validateCampusCourseLead = (data) => {
   return errors;
 };
 
+/**
+ * Validates Contact Us form data
+ * @param {Object} data - Contact form data
+ * @returns {Array} Array of error objects
+ */
+const validateContactUs = (data) => {
+  const errors = [];
+  const { fullName, email, phoneNumber, subject, message } = data;
+
+  if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
+    errors.push({ field: 'fullName', message: 'Full Name is required' });
+  }
+
+  if (!email || typeof email !== 'string' || !email.trim()) {
+    errors.push({ field: 'email', message: 'Email is required' });
+  } else if (!validator.isEmail(email.trim())) {
+    errors.push({ field: 'email', message: 'Valid email is required' });
+  }
+
+  if (!phoneNumber || typeof phoneNumber !== 'string' || !phoneNumber.trim()) {
+    errors.push({ field: 'phoneNumber', message: 'Phone number is required' });
+  }
+
+  if (!subject || typeof subject !== 'string' || !subject.trim()) {
+    errors.push({ field: 'subject', message: 'Subject is required' });
+  }
+
+  if (!message || typeof message !== 'string' || !message.trim()) {
+    errors.push({ field: 'message', message: 'Message is required' });
+  } else if (message.trim().length < 10) {
+    errors.push({ field: 'message', message: 'Message must be at least 10 characters long' });
+  }
+
+  return errors;
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -436,5 +472,6 @@ module.exports = {
   validateBlog,
   validateCampusCourse,
   validateCampusCourseLead,
+  validateContactUs,
   validator, // Export validator for custom validations
 };
