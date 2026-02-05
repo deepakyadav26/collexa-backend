@@ -31,7 +31,7 @@ const contactUsSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Message is required'],
       trim: true,
-      minlength: 10,
+      maxlength: 150,
     },
     // Status to track if the lead has been contacted/resolved (optional but good for admin)
     status: {
