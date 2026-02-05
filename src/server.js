@@ -18,6 +18,7 @@ const campusCourseRoutes = require('./routes/campusCourseRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const internshipApplicationRoutes = require('./routes/internshipApplicationRoutes');
 const certificateCourseRoutes = require('./routes/certificateCourseRoutes');
+const contactUsRoutes = require('./routes/contactUsRoutes');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/campuscourses', campusCourseRoutes);
 app.use('/api/applications', applicationRoutes); //  Job Application Routes
 app.use('/api/internship-applications', internshipApplicationRoutes);
 app.use('/api/certificatecourses', certificateCourseRoutes);
+app.use('/api/contactus', contactUsRoutes);
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/collexa';
