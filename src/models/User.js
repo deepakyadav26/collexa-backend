@@ -73,7 +73,7 @@ const userSchema = new mongoose.Schema(
       resumeUrl: { type: String, trim: true },
       profilePicture: { 
         type: String, 
-        default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' 
+        default: null,
       },
       website: { type: String, trim: true },
       location: { type: String, trim: true },
