@@ -15,11 +15,11 @@ router.post('/apply/:jobId', protect, upload.single('resume'), async (req, res) 
     const { jobId } = req.params;
     const userId = req.user._id;
 
-    console.log('Request Headers Content-Type:', req.headers['content-type']);
+    // console.log('Request Headers Content-Type:', req.headers['content-type']);
 
     // Extract body fields
-    console.log('Received Body:', req.body);
-    console.log('Received File:', req.file);
+    // console.log('Received Body:', req.body);
+    // console.log('Received File:', req.file);
     const { fullName, email, phoneNumber, whyHireYou } = req.body;
 
     // 1. Initial File Check
