@@ -23,13 +23,13 @@ const contactUsSchema = new mongoose.Schema(
     },
     subject: {
       type: String,
-      required: [true, 'Subject is required'],
+      // required: [true, 'Subject is required'],
       trim: true,
       maxlength: 100,
     },
     message: {
       type: String,
-      required: [true, 'Message is required'],
+      // required: [true, 'Message is required'],
       trim: true,
       maxlength: 150,
     },
