@@ -38,7 +38,14 @@ router.post(
 // GET /api/internship/listinginternship - list all active internships (Publicly accessible) for intership
 router.get('/listinginternship', async (req, res) => {
   try {
-    const internships = await Internship.find({ isActive: true })
+    const { category } = req.query;
+    const filter = { isActive: true };
+
+    if (category && category !== 'All') {
+      filter.category = category;
+    }
+
+    const internships = await Internship.find(filter)
       .populate('company')
       .sort({
         createdAt: -1,
