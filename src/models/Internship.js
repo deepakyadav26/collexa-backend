@@ -4,6 +4,12 @@ const internshipSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
+    category: {
+      type: String,
+      required: [true, 'Category is required'],
+      enum: ['Big brands', 'Work from home', 'Part-time', 'MBA', 'Engineering', 'Media', 'Design', 'Data Science', 'Accounting'],
+      trim: true,
+    },
     // companyName: { type: String, required: true, trim: true },
     location: { type: String, required: true, trim: true },
     stipendMin: { type: Number },

@@ -250,10 +250,10 @@ const validateJobOrInternship = (data) => {
   }
 
   // Category validation
-  if (!data.category || !['Big brands', 'Work from home', 'Part-time', 'MBA', 'Engineering', 'Media', 'Design', 'Data Science'].includes(data.category)) {
+  if (!data.category || !['Big brands', 'Work from home', 'Part-time', 'MBA', 'Engineering', 'Media', 'Design', 'Data Science', 'Accounting'].includes(data.category)) {
     errors.push({
       field: 'category',
-      message: 'Category must be one of: Big brands, Work from home, Part-time, MBA, Engineering, Media, Design, Data Science',
+      message: 'Category must be one of: Big brands, Work from home, Part-time, MBA, Engineering, Media, Design, Data Science, Accounting',
     });
   }
   // Company name validation
