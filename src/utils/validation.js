@@ -248,6 +248,14 @@ const validateJobOrInternship = (data) => {
       message: 'Description is required',
     });
   }
+
+  // Category validation
+  if (!data.category || !['Big brands', 'Work from home', 'Part-time', 'MBA', 'Engineering', 'Media', 'Design', 'Data Science'].includes(data.category)) {
+    errors.push({
+      field: 'category',
+      message: 'Category must be one of: Big brands, Work from home, Part-time, MBA, Engineering, Media, Design, Data Science',
+    });
+  }
   // Company name validation
   // if (!data.companyName || typeof data.companyName !== 'string' || !data.companyName.trim()) {
   //   errors.push({
@@ -353,12 +361,17 @@ const validateCampusCourse = (data) => {
   const { 
     universityName, 
     courseName, 
+    category,
     degreeType, 
     description, 
     duration, 
     level, 
     location 
   } = data;
+
+  if (!category || !['Engineering', 'Management', 'Technology', 'Business', 'Design', 'Arts', 'Science'].includes(category)) {
+      errors.push({ field: 'category', message: 'Category must be one of: Engineering, Management, Technology, Business, Design, Arts, Science' });
+  }
 
   if (!universityName || !universityName.trim()) {
     errors.push({ field: 'universityName', message: 'University name is required' });

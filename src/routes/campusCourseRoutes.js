@@ -35,7 +35,14 @@ router.post(
 // GET /api/campuscourses - List all active campus courses (Public)
 router.get('/', async (req, res) => {
   try {
-    const courses = await CampusCourse.find({ isActive: true }).sort({ createdAt: -1 });
+    const { category } = req.query;
+    const filter = { isActive: true };
+
+    if (category && category !== 'All') {
+      filter.category = category;
+    }
+
+    const courses = await CampusCourse.find(filter).sort({ createdAt: -1 });
     return res.status(200).json({ success: true, count: courses.length, courses });
   } catch (err) {
     console.error(err);
