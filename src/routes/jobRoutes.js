@@ -36,7 +36,13 @@ router.post(
 // GET /api/jobs/listingjob - list all active jobs (Publicly accessible)
 router.get('/listingjob', async (req, res) => {
   try {
+    const { category } = req.query;
     const filter = { isActive: true };
+
+    if (category && category !== 'All') {
+      filter.category = category;
+    }
+
     // Populate company details
     const jobs = await Job.find(filter).populate('company').sort({ createdAt: -1 });
     return res.status(200).json({ jobs });

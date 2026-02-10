@@ -12,6 +12,12 @@ const campusCourseSchema = new mongoose.Schema(
       required: [true, 'Course name is required'],
       trim: true,
     },
+    category: {
+      type: String,
+      required: [true, 'Category is required'],
+      enum: ['Engineering', 'Management', 'Technology', 'Business', 'Design', 'Arts', 'Science'],
+      trim: true,
+    },
     degreeType: {
       type: String,
       required: [true, 'Degree type is required'], // e.g. B.Tech
