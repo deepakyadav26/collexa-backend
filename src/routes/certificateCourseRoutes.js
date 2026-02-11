@@ -2,6 +2,8 @@ const express = require('express');
 const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 const CertificateCourse = require('../models/CertificateCourse');
 
+const { validateCertificateCourse } = require('../utils/validation');
+
 const router = express.Router();
 
 // @route   POST /api/certificate-courses/add
@@ -12,6 +14,12 @@ router.post(
   protect,
   authorizeRoles('admin'),
   async (req, res) => {
+    // Validate request data
+    const errors = validateCertificateCourse(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+
     try {
       const {
         title,
@@ -68,7 +76,14 @@ router.post(
 router.get('/listAll', async (req, res) => {
   try {
     // Optional: Filtering/sorting could be added via query params
-    const courses = await CertificateCourse.find().sort({ createdAt: -1 });
+    const { category } = req.query;
+    const filter = {};
+
+    if (category && category !== 'All') {
+      filter.category = category;
+    }
+
+    const courses = await CertificateCourse.find(filter).sort({ createdAt: -1 });
     
     return res.status(200).json({
       success: true,

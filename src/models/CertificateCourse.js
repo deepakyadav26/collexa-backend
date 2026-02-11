@@ -42,6 +42,7 @@ const certificateCourseSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, 'Category is required'],
+      enum: ['Digital Skills', 'Communication', 'Leadership', 'Technical Skills', 'Creative Skills', 'Business Skills', 'Personal Development', 'Industry Specific'],
       trim: true,
     },
     currentPrice: {
