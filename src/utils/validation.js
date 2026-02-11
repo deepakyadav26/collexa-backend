@@ -475,6 +475,54 @@ const validateContactUs = (data) => {
   return errors;
 };
 
+/**
+ * Validates certificate course data
+ * @param {Object} data - Certificate course data
+ * @returns {Array} Array of error objects
+ */
+const validateCertificateCourse = (data) => {
+  const errors = [];
+  const { 
+    title,
+    instructor,
+    level,
+    duration,
+    category,
+    currentPrice,
+    originalPrice
+  } = data;
+
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    errors.push({ field: 'title', message: 'Course title is required' });
+  }
+
+  if (!instructor || typeof instructor !== 'string' || !instructor.trim()) {
+      errors.push({ field: 'instructor', message: 'Instructor name is required' });
+  }
+
+  if (!level || !['Beginner', 'Intermediate', 'Advanced', 'All Levels'].includes(level)) {
+      errors.push({ field: 'level', message: 'Level must be one of: Beginner, Intermediate, Advanced, All Levels' });
+  }
+
+  if (!duration || typeof duration !== 'string' || !duration.trim()) {
+      errors.push({ field: 'duration', message: 'Duration is required' });
+  }
+
+  if (!category || !['Digital Skills', 'Communication', 'Leadership', 'Technical Skills', 'Creative Skills', 'Business Skills', 'Personal Development', 'Industry Specific'].includes(category)) {
+      errors.push({ field: 'category', message: 'Invalid or missing category' });
+  }
+
+  if (currentPrice === undefined || currentPrice === null || isNaN(currentPrice)) {
+      errors.push({ field: 'currentPrice', message: 'Current price is required and must be a number' });
+  }
+
+  if (originalPrice === undefined || originalPrice === null || isNaN(originalPrice)) {
+      errors.push({ field: 'originalPrice', message: 'Original price is required and must be a number' });
+  }
+
+  return errors;
+};
+
 module.exports = {
   validateRegister,
   validateLogin,
@@ -486,5 +534,6 @@ module.exports = {
   validateCampusCourse,
   validateCampusCourseLead,
   validateContactUs,
+  validateCertificateCourse,
   validator, // Export validator for custom validations
 };
