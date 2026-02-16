@@ -109,6 +109,40 @@ router.get('/my-applications', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/applications/job-applications/all
+// @desc    Get All Job Applications (Admin Only) with pagination
+// @access  Private (Admin only)
+router.get(
+  '/job-applications/all',
+  protect,
+  authorizeRoles('admin'),
+  async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const totalApplications = await Application.countDocuments();
+      const applications = await Application.find()
+        .populate('user', 'firstName lastName emailId phoneNumber profile') // Populate applicant details
+        .populate('job', 'title') // Populate basic job details
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      return res.status(200).json({
+        applications,
+        currentPage: page,
+        totalPages: Math.ceil(totalApplications / limit),
+        totalApplications,
+      });
+    } catch (err) {
+      console.error('Error fetching all applications:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
 // @route   GET /api/applications/job-applications/:jobId Get All Applications for a specific job Id (Admin view Only)
 // @desc    Get all applications for a specific job (Admin view)
 // @access  Private (Admin only)
@@ -140,18 +174,26 @@ router.patch(
   '/status/:applicationId',
   protect,
   authorizeRoles('admin'),
+  upload.none(),
   async (req, res) => {
     try {
       const { applicationId } = req.params;
       const { status } = req.body;
 
-      // console.log('PATCH Status Update - Body:', req.body);
-      // console.log('Received Status:', status);
+      console.log('PATCH Headers Content-Type:', req.headers['content-type']);
+      console.log('PATCH Body:', req.body); // Debug log
 
-      // Validate status
+      if (!status) {
+        return res.status(400).json({ message: 'Status is required in request body' });
+      }
+
+      // Validate status (trim to handle accidental spaces)
       const validStatuses = ['Applied', 'Shortlisted', 'Rejected', 'Hired'];
-      if (!validStatuses.includes(status)) {
-        return res.status(400).json({ message: 'Invalid status' });
+      if (!validStatuses.includes(status.trim())) {
+        return res.status(400).json({ 
+          message: `Invalid status. Allowed: ${validStatuses.join(', ')}`,
+          received: status
+        });
       }
 
       const application = await Application.findById(applicationId);
@@ -159,7 +201,7 @@ router.patch(
         return res.status(404).json({ message: 'Application not found' });
       }
 
-      application.status = status;
+      application.status = status.trim();
       await application.save();
 
       return res.status(200).json({
