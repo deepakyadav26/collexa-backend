@@ -242,6 +242,7 @@ const forgetPasswordLimiter = limiter({
 });
 
 // POST /api/auth/forgetPassword (with email sending and rate limiting)
+// POST /api/auth/forgetPassword (Generate OTP and send email)
 router.post('/forgetPassword', forgetPasswordLimiter, async (req, res) => {
     // Validate request data
     const errors = validateEmail(req.body);
@@ -256,49 +257,79 @@ router.post('/forgetPassword', forgetPasswordLimiter, async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Generate token
-      const resetToken = crypto.randomBytes(32).toString('hex');
+      // Generate 4-digit OTP
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
       
-      // Hash user token and save to database (optional security step, but simplicity requested first)
-      // Here saving plain token as per existing schema structure implies plain token storage or similar. 
-      // The schema has resetPasswordToken: String.
-      user.resetPasswordToken = resetToken;
-      user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
-      await user.save(); // Validate false if other fields are issues? No, just save.
-
-      // Create reset URL
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${emailId}`;
+      // Store OTP in database (hashed ideally, but plain for now as per previous pattern and request simplicity)
+      user.resetPasswordToken = otp;
+      user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+      await user.save();
 
       // LOG FOR DEVELOPMENT TESTING
       console.log('----------------------------------------------------');
-      console.log('PASSWORD RESET LINK (For Testing):');
-      console.log(resetUrl);
+      console.log(`OTP GENERATED FOR ${emailId}: ${otp}`);
       console.log('----------------------------------------------------');
 
-      const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+      const message = `Your OTP for password reset is: ${otp}\n\nThis OTP is valid for 10 minutes.`;
       
       const html = `
-        <h1>Password Reset Request</h1>
-        <p>Please click on the following link to reset your password:</p>
-        <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
-        <p>If you did not request this, please ignore this email.</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Password Reset OTP</title>
+          <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .brand { color: #4A90E2; font-size: 28px; font-weight: bold; text-decoration: none; letter-spacing: 1px; }
+            .content-card { background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 40px; text-align: center; border-top: 4px solid #4A90E2; }
+            .title { color: #333333; font-size: 24px; margin-bottom: 20px; font-weight: 600; }
+            .text { color: #666666; font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
+            .otp-box { background-color: #f0f4f8; border-radius: 6px; padding: 15px; margin: 30px 0; display: inline-block; }
+            .otp-code { color: #2c3e50; font-size: 36px; font-weight: 700; letter-spacing: 5px; font-family: monospace; }
+            .footer { text-align: center; margin-top: 30px; color: #999999; font-size: 14px; }
+            .footer-link { color: #999999; text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <a href="#" class="brand">Collexa</a>
+            </div>
+            <div class="content-card">
+              <h1 class="title">Password Reset Request</h1>
+              <p class="text">Hello,</p>
+              <p class="text">We received a request to reset your password. Use the verification code below to complete the process. This code is valid for 10 minutes.</p>
+              
+              <div class="otp-box">
+                <span class="otp-code">${otp}</span>
+              </div>
+              
+              <p class="text">If you didn't request this, you can safely ignore this email.</p>
+            </div>
+            <div class="footer">
+              <p>&copy; ${new Date().getFullYear()} Collexa. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
       `;
 
       try {
         await sendEmail({
           email: user.emailId,
-          subject: 'Password Reset Token',
+          subject: 'Password Reset OTP',
           message,
           html
         });
 
-        return res.status(200).json({ success: true, data: 'Email sent' });
+        return res.status(200).json({ success: true, data: 'OTP sent to email' });
       } catch (err) {
         console.error(err);
         
-        // In production, we should clear the token if email fails to prevent unused tokens.
-        // But in development, we keep it so you can test using the console log link.
+        // In production, we should clear the token if email fails
         if (process.env.NODE_ENV !== 'development') {
           user.resetPasswordToken = undefined;
           user.resetPasswordExpires = undefined;
@@ -306,10 +337,10 @@ router.post('/forgetPassword', forgetPasswordLimiter, async (req, res) => {
           return res.status(500).json({ message: 'Email could not be sent' });
         }
 
-        // In dev, return success but warn about email failure
+        // In dev, keep token
         return res.status(200).json({ 
           success: true, 
-          data: 'Email failed to send (check console for error), but token preserved for local testing. Check server console for Reset Link.' 
+          data: 'Email failed to send (check console for error), but OTP generated for testing. Check server console.' 
         });
       }
 
@@ -320,26 +351,32 @@ router.post('/forgetPassword', forgetPasswordLimiter, async (req, res) => {
   }
 );
 
-// POST /api/auth/resetPassword
+// POST /api/auth/resetPassword (Verify OTP and update password)
 router.post('/resetPassword', async (req, res) => {
   try {
-    const { token, password } = req.body;
+    const { emailId, otp, newPassword } = req.body;
 
-    if (!token || !password) {
-       return res.status(400).json({ message: 'Please provide token and new password' });
+    if (!emailId || !otp || !newPassword) {
+       return res.status(400).json({ message: 'Please provide email, OTP, and new password' });
     }
 
+    // Find user with matching email, valid OTP, and not expired
     const user = await User.findOne({
-      resetPasswordToken: token,
+      emailId: emailId.trim().toLowerCase(),
+      resetPasswordToken: otp,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid token' });
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
     // Set new password
-    user.password = password;
+    user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
