@@ -8,6 +8,7 @@ const {
   validateEmail, 
   validateCompanyRegister 
 } = require('../utils/validation');
+const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -347,6 +348,43 @@ router.post('/resetPassword', async (req, res) => {
     return res.status(200).json({
       success: true,
       data: 'Password reset successful',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/auth/changePassword
+// @desc    Change password (authenticated users)
+// @access  Private
+router.post('/changePassword', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Please provide current and new password' });
+    }
+
+    // Get user with password
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check current password
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect current password' });
+    }
+
+    if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password updated successfully',
     });
   } catch (err) {
     console.error(err);
