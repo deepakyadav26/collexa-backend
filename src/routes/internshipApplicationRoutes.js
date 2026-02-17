@@ -112,6 +112,43 @@ router.get('/my-applications', protect, async (req, res) => {
   }
 });
 
+
+// @route   GET /api/internship-applications/internship-applications/all
+// @desc    Get all internship applications (Admin view) with pagination
+// @access  Private (Admin only)
+router.get(
+  '/internship-applications/all',
+  protect,
+  authorizeRoles('admin'),
+  async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const totalApplications = await InternshipApplication.countDocuments();
+      const totalPages = Math.ceil(totalApplications / limit);
+
+      const applications = await InternshipApplication.find()
+        .populate('user', 'firstName lastName emailId phoneNumber profile')
+        .populate('internship', 'title company')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      return res.status(200).json({
+        applications,
+        currentPage: page,
+        totalPages,
+        totalApplications,
+      });
+    } catch (err) {
+      console.error('Error fetching all internship applications:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
 // @route   GET /api/internship-applications/internship-applications/:internshipId
 // @desc    Get all applications for a specific internship (Admin view)
 // @access  Private (Admin only)
