@@ -235,7 +235,7 @@ const sendEmail = require('../utils/sendEmail');
 
 const forgetPasswordLimiter = limiter({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // Limit each IP to 5 requests per windowMs
+  // max: 10, // Limit each IP to 5 requests per windowMs
   message: 'Too many password reset requests from this IP, please try again after an hour',
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -243,7 +243,7 @@ const forgetPasswordLimiter = limiter({
 
 // POST /api/auth/forgetPassword (with email sending and rate limiting)
 // POST /api/auth/forgetPassword (Generate OTP and send email)
-router.post('/forgetPassword', forgetPasswordLimiter, async (req, res) => {
+router.post('/forgetPassword', async (req, res) => {
     // Validate request data
     const errors = validateEmail(req.body);
     if (errors.length > 0) {
